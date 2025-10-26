@@ -1,0 +1,212 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API - Social (USUARIO / POST / COMENTARIO)",
+    "version": "1.0.0",
+    "description": "Documentación de la API para Usuarios, Posts y Comentarios. Basado en el modelo ER provisto."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor local"
+    }
+  ],
+  "paths": {
+    "/usuarios": {
+      "post": {
+        "summary": "Crear USUARIO",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UsuarioCreate" },
+              "example": { "idu": "u123", "nombre": "JUAN" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Usuario creado" },
+          "500": { "description": "Error" }
+        }
+      }
+    },
+    "/usuarios/{idu}": {
+      "put": {
+        "summary": "Actualizar USUARIO",
+        "parameters": [{ "name": "idu", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UsuarioUpdate" } } }
+        },
+        "responses": { "200": { "description": "Usuario actualizado" }, "404": { "description": "No encontrado" } }
+      },
+      "delete": {
+        "summary": "Eliminar USUARIO",
+        "parameters": [{ "name": "idu", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Usuario eliminado" }, "404": { "description": "No encontrado" } }
+      }
+    },
+
+    "/posts": {
+      "post": {
+        "summary": "Crear POST (vinculado a un USUARIO mediante idu)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PostCreate" },
+              "example": { "idp": "p001", "contenido": "Mi primer post", "idu": "u123" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Post creado" }, "500": { "description": "Error" } }
+      }
+    },
+    "/posts/{idp}": {
+      "put": {
+        "summary": "Actualizar POST",
+        "parameters": [{ "name": "idp", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PostUpdate" } } } },
+        "responses": { "200": { "description": "Post actualizado" } }
+      },
+      "delete": {
+        "summary": "Eliminar POST",
+        "parameters": [{ "name": "idp", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Post eliminado" } }
+      }
+    },
+
+    "/comentarios": {
+      "post": {
+        "summary": "Crear COMENTARIO (vinculado a USUARIO y POST)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ComentarioCreate" },
+              "example": {
+                "consec": "c001",
+                "contenidoCom": "Buen post!",
+                "fechoraCom": "2025-10-25T12:34:00",
+                "fechoraAut": null,
+                "likeNotLike": "megusta",
+                "idu": "u456",
+                "idp": "p001"
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Comentario creado" } }
+      }
+    },
+    "/comentarios/{consec}": {
+      "put": {
+        "summary": "Actualizar COMENTARIO",
+        "parameters": [{ "name": "consec", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ComentarioUpdate" } } } },
+        "responses": { "200": { "description": "Comentario actualizado" } }
+      },
+      "delete": {
+        "summary": "Eliminar COMENTARIO",
+        "parameters": [{ "name": "consec", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Comentario eliminado" } }
+      }
+    },
+
+    "/consultas/posts-usuario": {
+      "get": {
+        "summary": "CONSULTA 1 - Posts hechos por USUARIOS (excluye ANONIMO y MANAGER)",
+        "description": "Retorna los posts de usuarios cuyo nombre no sea 'ANONIMO' ni 'MANAGER'.",
+        "responses": {
+          "200": {
+            "description": "Lista de posts por usuario",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/PostUsuarioResult" } }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/consultas/comentarios-post": {
+      "get": {
+        "summary": "CONSULTA 2 - Comentarios de posts: detalle con fecha-hora y autorización",
+        "description": "Retorna para cada comentario: fecha-hora creación, comentario, fecha-hora autorización, quién autorizó, y si fue megusta/nomegusta.",
+        "responses": {
+          "200": {
+            "description": "Lista de comentarios con detalle",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ComentarioPostResult" } } } }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "UsuarioCreate": {
+        "type": "object",
+        "required": ["idu", "nombre"],
+        "properties": {
+          "idu": { "type": "string", "example": "u123" },
+          "nombre": { "type": "string", "example": "JUAN" }
+        }
+      },
+      "UsuarioUpdate": {
+        "type": "object",
+        "properties": { "nombre": { "type": "string", "example": "JUAN UPDATED" } }
+      },
+      "PostCreate": {
+        "type": "object",
+        "required": ["idp", "contenido", "idu"],
+        "properties": {
+          "idp": { "type": "string", "example": "p001" },
+          "contenido": { "type": "string", "example": "Contenido del post" },
+          "idu": { "type": "string", "example": "u123" }
+        }
+      },
+      "PostUpdate": {
+        "type": "object",
+        "properties": { "contenido": { "type": "string", "example": "Contenido actualizado" } }
+      },
+      "ComentarioCreate": {
+        "type": "object",
+        "required": ["consec", "contenidoCom", "fechoraCom", "idu", "idp"],
+        "properties": {
+          "consec": { "type": "string", "example": "c001" },
+          "contenidoCom": { "type": "string", "example": "Buen post!" },
+          "fechoraCom": { "type": "string", "format": "date-time", "example": "2025-10-25T12:34:00" },
+          "fechoraAut": { "type": ["string","null"], "format": "date-time", "example": null },
+          "likeNotLike": { "type": "string", "example": "megusta" },
+          "idu": { "type": "string", "example": "u456" },
+          "idp": { "type": "string", "example": "p001" }
+        }
+      },
+      "ComentarioUpdate": {
+        "type": "object",
+        "properties": { "contenidoCom": { "type": "string", "example": "Comentario editado" } }
+      },
+      "PostUsuarioResult": {
+        "type": "object",
+        "properties": {
+          "usuario": { "type": "string" },
+          "post": { "type": "string" }
+        }
+      },
+      "ComentarioPostResult": {
+        "type": "object",
+        "properties": {
+          "usuarioPost": { "type": "string" },
+          "post": { "type": "string" },
+          "comentario": { "type": "string" },
+          "fechaComentario": { "type": "string", "format": "date-time" },
+          "fechaAutorizacion": { "type": ["string","null"], "format": "date-time" },
+          "autorComentario": { "type": "string" },
+          "tipo": { "type": "string", "description": "megusta | nomegusta" }
+        }
+      }
+    }
+  }
+}

@@ -1,28 +1,25 @@
-import express from "express";
-import neo4j from "neo4j-driver";
+const express = require('express');
+const cors = require('cors');
+//Documentacion
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
+
+
+
+const usuarioRoutes = require('./routes/usuario');
+const postRoutes = require('./routes/post');
+const comentarioRoutes = require('./routes/comentario');
+const consultasRoutes = require('./routes/consultas');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-// Conexión con Neo4j
-const driver = neo4j.driver(
-  "bolt://localhost:7687",              // URL del servidor
-  neo4j.auth.basic("neo4j", "admin2025")  
-);
+app.use('/usuarios', usuarioRoutes);
+app.use('/posts', postRoutes);
+app.use('/comentarios', comentarioRoutes);
+app.use('/consultas', consultasRoutes);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Ruta de prueba
-app.get("/personas", async (req, res) => {
-  const session = driver.session();
-  try {
-    const result = await session.run("MATCH (p:Persona) RETURN p LIMIT 5");
-    const personas = result.records.map(r => r.get("p").properties);
-    res.json(personas);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al consultar Neo4j");
-  } finally {
-    await session.close();
-  }
-});
-
-app.listen(3000, () => console.log("Servidor corriendo en http://localhost:3000"));
+app.listen(3000, () => console.log('🚀 Servidor corriendo en http://localhost:3000'));
+console.log('Swagger UI disponible en http://localhost:3000/api-docs');

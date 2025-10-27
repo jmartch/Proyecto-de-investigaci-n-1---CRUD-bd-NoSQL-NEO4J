@@ -1,122 +1,112 @@
-import { useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { useState } from "react";
 
 export default function Posts() {
-  const [list, setList] = useState([]);
-  const [form, setForm] = useState({ userId: '', title: '', body: '' });
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  async function load() {
-    try {
-      setLoading(true);
-      const data = await api('/posts');
-      setList(data || []);
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
-
-  function onChange(e) {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  }
-
-  async function onCreate(e) {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await api('/posts', { method: 'POST', body: JSON.stringify(form) });
-      setForm({ userId:'', title:'', body:'' });
-      await load();
-      setMsg('Post creado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onUpdate(id) {
-    try {
-      setLoading(true);
-      await api(`/posts/${id}`, { method: 'PUT', body: JSON.stringify(form) });
-      setEditingId(null);
-      setForm({ userId:'', title:'', body:'' });
-      await load();
-      setMsg('Post actualizado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onDelete(id) {
-    if (!confirm('¿Eliminar post?')) return;
-    try {
-      setLoading(true);
-      await api(`/posts/${id}`, { method: 'DELETE' });
-      await load();
-      setMsg('Post eliminado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function startEdit(p) {
-    setEditingId(p.id || p._id);
-    setForm({
-      userId: p.userId || p.user_id || '',
-      title: p.title || '',
-      body: p.body || '',
-    });
-  }
+  const [tab, setTab] = useState("insertar"); // insertar | actualizar | borrar
 
   return (
-    <section>
-      <h2>Posts</h2>
-
-      <form onSubmit={editingId ? (e)=>{e.preventDefault(); onUpdate(editingId);} : onCreate}
-            style={{ display: 'grid', gap: 8, maxWidth: 520 }}>
-        <input name="userId" value={form.userId} onChange={onChange} placeholder="ID de Usuario (owner)" required />
-        <input name="title" value={form.title} onChange={onChange} placeholder="Título" required />
-        <textarea name="body" value={form.body} onChange={onChange} placeholder="Contenido" rows={4} required />
-        <button type="submit" disabled={loading}>
-          {editingId ? 'Guardar cambios' : 'Crear post'}
+    <div className="container" style={{ paddingTop: 8 }}>
+      {/* Tabs */}
+      <div className="crud-tabs" style={{ marginBottom: 12 }}>
+        <button
+          className={`crud-tab ${tab === "insertar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("insertar")}
+        >
+          Insertar
         </button>
-        {editingId && (
-          <button type="button" onClick={() => { setEditingId(null); setForm({ userId:'', title:'', body:'' }); }}>
-            Cancelar edición
-          </button>
-        )}
-      </form>
+        <button
+          className={`crud-tab ${tab === "actualizar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("actualizar")}
+        >
+          Actualizar
+        </button>
+        <button
+          className={`crud-tab ${tab === "borrar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("borrar")}
+        >
+          Borrar
+        </button>
+      </div>
 
-      <hr style={{ margin: '16px 0' }} />
+      {/* INSERTAR */}
+      {tab === "insertar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Insertar POST</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDP</label>
+                <input className="input" placeholder="Ingrese IDP" />
+              </div>
+              <div className="field">
+                <label className="label">Contenido *</label>
+                <input className="input" placeholder="Ingrese contenido del post" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Insertar post
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
-      {loading && <p>Cargando...</p>}
-      {msg && <p><small>{msg}</small></p>}
+      {/* ACTUALIZAR */}
+      {tab === "actualizar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Actualizar POST</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDP *</label>
+                <input className="input" placeholder="IDP existente" />
+              </div>
+              <div className="field">
+                <label className="label">Nuevo contenido *</label>
+                <input className="input" placeholder="Contenido actualizado" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Guardar cambios
+              </button>
+              <button className="btn btn--ghost btn--disabled" type="button" disabled>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
-      <ul style={{ paddingLeft: 16 }}>
-        {list.map(p => {
-          const id = p.id || p._id;
-          return (
-            <li key={id} style={{ marginBottom: 12 }}>
-              <b>({p.userId || p.user_id}) {p.title}</b>
-              <p style={{ margin: '4px 0' }}>{p.body}</p>
-              <button onClick={() => startEdit(p)}>Editar</button>{' '}
-              <button onClick={() => onDelete(id)}>Eliminar</button>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+      {/* BORRAR */}
+      {tab === "borrar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Borrar POST</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDP *</label>
+                <input className="input" placeholder="IDP del post a eliminar" />
+              </div>
+              <div className="field">
+                <label className="label">Contenido *</label>
+                <input className="input" placeholder="Contenido asociado (opcional)" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--danger btn--disabled" type="button" disabled>
+                Eliminar post
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* Tabla (visual) */}
+      <section className="card" style={{ marginTop: 12 }}>
+        <h3 className="crud-title" style={{ marginBottom: 8 }}>Listado de POSTS</h3>
+        <div className="empty">No hay posts para mostrar.</div>
+      </section>
+    </div>
   );
 }

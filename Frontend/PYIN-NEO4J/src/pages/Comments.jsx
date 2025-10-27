@@ -1,136 +1,147 @@
-import { useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { useState } from "react";
 
 export default function Comments() {
-  const [list, setList] = useState([]);
-  const [form, setForm] = useState({
-    postId: '',
-    userId: '',
-    content: '',
-    like: false, // true: megusta, false: nomegusta
-  });
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  async function load() {
-    try {
-      setLoading(true);
-      const data = await api('/comments');
-      setList(data || []);
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
-
-  function onChange(e) {
-    const { name, value, type, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
-  }
-
-  async function onCreate(e) {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await api('/comments', { method: 'POST', body: JSON.stringify(form) });
-      setForm({ postId:'', userId:'', content:'', like:false });
-      await load();
-      setMsg('Comentario creado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onUpdate(id) {
-    try {
-      setLoading(true);
-      await api(`/comments/${id}`, { method: 'PUT', body: JSON.stringify(form) });
-      setEditingId(null);
-      setForm({ postId:'', userId:'', content:'', like:false });
-      await load();
-      setMsg('Comentario actualizado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onDelete(id) {
-    if (!confirm('¿Eliminar comentario?')) return;
-    try {
-      setLoading(true);
-      await api(`/comments/${id}`, { method: 'DELETE' });
-      await load();
-      setMsg('Comentario eliminado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function startEdit(c) {
-    setEditingId(c.id || c._id);
-    setForm({
-      postId: c.postId || c.post_id || '',
-      userId: c.userId || c.user_id || '',
-      content: c.content || c.comment || '',
-      like: !!(c.like ?? c.megusta), // acepta variantes
-    });
-  }
+  const [tab, setTab] = useState("insertar"); // insertar | actualizar | borrar
 
   return (
-    <section>
-      <h2>Comentarios</h2>
-
-      <form onSubmit={editingId ? (e)=>{e.preventDefault(); onUpdate(editingId);} : onCreate}
-            style={{ display: 'grid', gap: 8, maxWidth: 520 }}>
-        <input name="postId" value={form.postId} onChange={onChange} placeholder="ID del Post" required />
-        <input name="userId" value={form.userId} onChange={onChange} placeholder="ID del Usuario" required />
-        <textarea name="content" value={form.content} onChange={onChange} placeholder="Comentario" rows={3} required />
-        <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <input type="checkbox" name="like" checked={form.like} onChange={onChange} />
-          ¿Me gusta? (desmarcado = No me gusta)
-        </label>
-        <button type="submit" disabled={loading}>
-          {editingId ? 'Guardar cambios' : 'Crear comentario'}
+    <div className="container" style={{ paddingTop: 8 }}>
+      {/* Tabs */}
+      <div className="crud-tabs" style={{ marginBottom: 12 }}>
+        <button
+          className={`crud-tab ${tab === "insertar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("insertar")}
+        >
+          Insertar
         </button>
-        {editingId && (
-          <button type="button" onClick={() => { setEditingId(null); setForm({ postId:'', userId:'', content:'', like:false }); }}>
-            Cancelar edición
-          </button>
-        )}
-      </form>
+        <button
+          className={`crud-tab ${tab === "actualizar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("actualizar")}
+        >
+          Actualizar
+        </button>
+        <button
+          className={`crud-tab ${tab === "borrar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("borrar")}
+        >
+          Borrar
+        </button>
+      </div>
 
-      <hr style={{ margin: '16px 0' }} />
-
-      {loading && <p>Cargando...</p>}
-      {msg && <p><small>{msg}</small></p>}
-
-      <ul style={{ paddingLeft: 16 }}>
-        {list.map(c => {
-          const id = c.id || c._id;
-          const like = !!(c.like ?? c.megusta);
-          return (
-            <li key={id} style={{ marginBottom: 12 }}>
-              <b>Post {c.postId || c.post_id} — User {c.userId || c.user_id}</b>
-              <p style={{ margin: '4px 0' }}>{c.content || c.comment}</p>
-              <small>{like ? '👍 Me gusta' : '👎 No me gusta'}</small>
-              <div>
-                <button onClick={() => startEdit(c)}>Editar</button>{' '}
-                <button onClick={() => onDelete(id)}>Eliminar</button>
+      {/* INSERTAR */}
+      {tab === "insertar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Insertar COMENTARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">consec *</label>
+                <input className="input" placeholder="Código/llave del comentario" />
               </div>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+              <div className="field">
+                <label className="label">fechacomen *</label>
+                <input className="input" placeholder="YYYY-MM-DD HH:mm" />
+              </div>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 12 }}>
+              <div className="field">
+                <label className="label">likenotlike *</label>
+                <input className="input" placeholder="megusta / nomegusta" />
+              </div>
+              <div className="field">
+                <label className="label">fechaautor *</label>
+                <input className="input" placeholder="YYYY-MM-DD HH:mm" />
+              </div>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 12 }}>
+              <div className="field" style={{ flex: "1 1 100%" }}>
+                <label className="label">contenidocomen *</label>
+                <input className="input" placeholder="Contenido del comentario" />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Insertar comentario
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* ACTUALIZAR (consec como clave, el resto editable) */}
+      {tab === "actualizar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Actualizar COMENTARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">consec *</label>
+                <input className="input" placeholder="Código existente" />
+              </div>
+              <div className="field">
+                <label className="label">fechacomen *</label>
+                <input className="input" placeholder="YYYY-MM-DD HH:mm" />
+              </div>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 12 }}>
+              <div className="field">
+                <label className="label">likenotlike *</label>
+                <input className="input" placeholder="megusta / nomegusta" />
+              </div>
+              <div className="field">
+                <label className="label">fechaautor *</label>
+                <input className="input" placeholder="YYYY-MM-DD HH:mm" />
+              </div>
+            </div>
+
+            <div className="field-row" style={{ marginTop: 12 }}>
+              <div className="field" style={{ flex: "1 1 100%" }}>
+                <label className="label">contenidocomen *</label>
+                <input className="input" placeholder="Contenido actualizado" />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Guardar cambios
+              </button>
+              <button className="btn btn--ghost btn--disabled" type="button" disabled>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* BORRAR (solo consec por ser PK) */}
+      {tab === "borrar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Borrar COMENTARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">consec *</label>
+                <input className="input" placeholder="Código a eliminar" />
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="btn btn--danger btn--disabled" type="button" disabled>
+                Eliminar comentario
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* Tabla (visual) */}
+      <section className="card" style={{ marginTop: 12 }}>
+        <h3 className="crud-title" style={{ marginBottom: 8 }}>Listado de COMENTARIOS</h3>
+        <div className="empty">No hay comentarios para mostrar.</div>
+      </section>
+    </div>
   );
 }

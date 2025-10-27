@@ -26,7 +26,7 @@ export default function App() {
           <div style={{display:'flex', gap:10}}>
             <button className="btn btn--primary" onClick={() => setPage(PAGES.users)}>Gestionar Usuarios</button>
             <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>Gestionar Posts</button>
-            <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>Gestionar Comentarios</button>
+            <button className="btn btn--ghost" onClick={() => setPage(PAGES.comments)}>Gestionar Comentarios</button>
           </div>
         </div>
       );

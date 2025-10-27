@@ -1,122 +1,113 @@
-import { useEffect, useState } from 'react';
-import { api } from '../lib/api';
+import { useState } from "react";
 
 export default function Users() {
-  const [list, setList] = useState([]);
-  const [form, setForm] = useState({ name: '', email: '' });
-  const [editingId, setEditingId] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState('');
-
-  async function load() {
-    try {
-      setLoading(true);
-      const data = await api('/users');
-      setList(data || []);
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => { load(); }, []);
-
-  function onChange(e) {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  }
-
-  async function onCreate(e) {
-    e.preventDefault();
-    try {
-      setLoading(true);
-      await api('/users', {
-        method: 'POST',
-        body: JSON.stringify(form),
-      });
-      setForm({ name: '', email: '' });
-      await load();
-      setMsg('Usuario creado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onUpdate(id) {
-    try {
-      setLoading(true);
-      await api(`/users/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(form),
-      });
-      setEditingId(null);
-      setForm({ name: '', email: '' });
-      await load();
-      setMsg('Usuario actualizado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onDelete(id) {
-    if (!confirm('¿Eliminar usuario?')) return;
-    try {
-      setLoading(true);
-      await api(`/users/${id}`, { method: 'DELETE' });
-      await load();
-      setMsg('Usuario eliminado');
-    } catch (e) {
-      setMsg(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function startEdit(u) {
-    setEditingId(u.id || u._id);
-    setForm({ name: u.name || '', email: u.email || '' });
-  }
+  const [tab, setTab] = useState("insertar"); // insertar | actualizar | borrar
 
   return (
-    <section>
-      <h2>Usuarios</h2>
-
-      <form onSubmit={editingId ? (e)=>{e.preventDefault(); onUpdate(editingId);} : onCreate}
-            style={{ display: 'grid', gap: 8, maxWidth: 420 }}>
-        <input name="name" value={form.name} onChange={onChange} placeholder="Nombre" required />
-        <input name="email" value={form.email} onChange={onChange} placeholder="Email" type="email" required />
-        <button type="submit" disabled={loading}>
-          {editingId ? 'Guardar cambios' : 'Crear usuario'}
+    <div className="container" style={{paddingTop: 8}}>
+      {/* Tabs */}
+      <div className="crud-tabs" style={{marginBottom: 12}}>
+        <button
+          className={`crud-tab ${tab === "insertar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("insertar")}
+        >
+          Insertar
         </button>
-        {editingId && (
-          <button type="button" onClick={() => { setEditingId(null); setForm({ name:'', email:'' }); }}>
-            Cancelar edición
-          </button>
-        )}
-      </form>
+        <button
+          className={`crud-tab ${tab === "actualizar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("actualizar")}
+        >
+          Actualizar
+        </button>
+        <button
+          className={`crud-tab ${tab === "borrar" ? "crud-tab--active" : ""}`}
+          onClick={() => setTab("borrar")}
+        >
+          Borrar
+        </button>
+      </div>
 
-      <hr style={{ margin: '16px 0' }} />
+      {/* INSERTAR */}
+      {tab === "insertar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Insertar USUARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDU</label>
+                <input className="input" placeholder="Ingrese IDU" />
+              </div>
+              <div className="field">
+                <label className="label">Nombre *</label>
+                <input className="input" placeholder="Ingrese nombre" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Insertar usuario
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
-      {loading && <p>Cargando...</p>}
-      {msg && <p><small>{msg}</small></p>}
+      {/* ACTUALIZAR */}
+      {tab === "actualizar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Actualizar USUARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDU *</label>
+                <input className="input" placeholder="IDU existente" />
+              </div>
+              <div className="field">
+                <label className="label">Nuevo nombre *</label>
+                <input className="input" placeholder="Nombre actualizado" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--primary btn--disabled" type="button" disabled>
+                Guardar cambios
+              </button>
+              <button className="btn btn--ghost btn--disabled" type="button" disabled>
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
-      <ul style={{ paddingLeft: 16 }}>
-        {list.map(u => {
-          const id = u.id || u._id;
-          return (
-            <li key={id} style={{ marginBottom: 8 }}>
-              <b>{u.name}</b> — {u.email}{' '}
-              <button onClick={() => startEdit(u)}>Editar</button>{' '}
-              <button onClick={() => onDelete(id)}>Eliminar</button>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+      {/* BORRAR */}
+      {tab === "borrar" && (
+        <section className="crud-section">
+          <h3 className="crud-title">Borrar USUARIO</h3>
+          <form className="form">
+            <div className="field-row">
+              <div className="field">
+                <label className="label">IDU *</label>
+                <input className="input" placeholder="IDU a eliminar" />
+              </div>
+              <div className="field">
+                <label className="label">Nombre *</label>
+                <input className="input" placeholder="Nombre asociado" />
+              </div>
+            </div>
+            <div className="actions">
+              <button className="btn btn--danger btn--disabled" type="button" disabled>
+                Eliminar usuario
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
+      {/* Tabla (visual) */}
+      <section className="card" style={{marginTop: 12}}>
+        <h3 className="crud-title" style={{marginBottom: 8}}>Listado de USUARIOS</h3>
+        <div className="empty">No hay usuarios para mostrar.</div>
+      </section>
+    </div>
   );
 }
+

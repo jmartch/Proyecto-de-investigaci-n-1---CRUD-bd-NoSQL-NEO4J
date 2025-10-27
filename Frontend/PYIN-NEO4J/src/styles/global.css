@@ -1,5 +1,5 @@
 /* =========================
-   🎨 Tokens (dark clean)
+  Tokens (dark clean)
    ========================= */
 :root{
   --bg: #0c0d11;
@@ -37,7 +37,7 @@ p{ margin:0 0 1rem; }
 .container{ width:100%; max-width:1180px; margin:0 auto; padding:0 24px; }
 
 /* =========================
-   🧭 Header / Navbar
+    Header / Navbar
    ========================= */
 .header{
   position:sticky; top:0; z-index:50;
@@ -68,7 +68,7 @@ p{ margin:0 0 1rem; }
 }
 
 /* =========================
-   📄 Page
+   Page
    ========================= */
 .page{
   min-height: calc(100dvh - 76px - 64px);
@@ -76,7 +76,7 @@ p{ margin:0 0 1rem; }
 }
 
 /* =========================
-   🧱 Cards
+    Cards
    ========================= */
 .card{
   background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--surface);
@@ -99,7 +99,7 @@ p{ margin:0 0 1rem; }
 }
 
 /* =========================
-   🔘 Buttons (utilities)
+   Buttons (utilities)
    ========================= */
 .btn {
   height: 60px;           
@@ -132,7 +132,7 @@ p{ margin:0 0 1rem; }
 
 
 /* =========================
-   📋 Tables (para tus CRUD)
+   Tables (para tus CRUD)
    ========================= */
 .table{
   width:100%; border-collapse:collapse; border:1px solid var(--border); border-radius:12px; overflow:hidden;
@@ -200,3 +200,4 @@ p{ margin:0 0 1rem; }
   padding:22px; text-align:center; color:var(--muted);
   border:1px dashed var(--border); border-radius:12px; background:var(--surface-2);
 }
+

@@ -15,14 +15,15 @@ export default function App() {
     switch (page) {
       case PAGES.home: return (
         <div className="card card--hero">
-          <h1>Proyecto NEO4J — Frontend</h1>
-          <p className="small">React + Vite (sin Tailwind) · Conéctalo a tu backend Node/Neo4j</p>
-          <div style={{height:16}} />
+          <h1> CONEXA - Proyecto NEO4J</h1>
+          <p className="small">Sistema de Gestión de Usuarios, Publicaciones y Comentarios basado en Neo4j</p>
+          <div style={{height:20}} />
           <Home />
           <div style={{height:16}} />
           <div style={{display:'flex', gap:10}}>
-            <button className="btn btn--primary" onClick={() => setPage(PAGES.users)}>Comenzar con Usuarios</button>
-            <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>Ver Posts</button>
+            <button className="btn btn--primary" onClick={() => setPage(PAGES.users)}>Gestionar Usuarios</button>
+            <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>Gestionar Posts</button>
+            <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>Gestionar Comentarios</button>
           </div>
         </div>
       );
@@ -40,7 +41,7 @@ export default function App() {
         <div className="container header__inner">
           <div className="brand">
             <span className="brand__dot" />
-            <span>Neo4j CRUD</span>
+            <span>CONEXA NEO4J</span>
           </div>
 
           <nav className="nav">
@@ -51,17 +52,17 @@ export default function App() {
 
             <button
               className={`nav__btn ${is(PAGES.users) ? 'nav__btn--active':''}`}
-              onClick={() => setPage(PAGES.users)}
+              disabled
             >Usuarios</button>
 
             <button
               className={`nav__btn ${is(PAGES.posts) ? 'nav__btn--active':''}`}
-              onClick={() => setPage(PAGES.posts)}
+              disabled
             >Posts</button>
 
             <button
               className={`nav__btn ${is(PAGES.comments) ? 'nav__btn--active':''}`}
-              onClick={() => setPage(PAGES.comments)}
+              disabled
             >Comentarios</button>
           </nav>
         </div>

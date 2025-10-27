@@ -85,24 +85,51 @@ p{ margin:0 0 1rem; }
   box-shadow: var(--shadow);
   padding: 22px;
 }
-.card--hero{
-  padding:28px;
+.card--hero {
+  padding: 80px 40px; 
+  min-height: calc(100vh - 76px - 64px); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;
+  text-align: center;
   background:
-    radial-gradient(900px 400px at 100% -40%, rgba(91,140,255,.18), transparent 60%),
+    radial-gradient(900px 600px at 100% -20%, rgba(91,140,255,.2), transparent 60%),
     var(--surface);
 }
 
 /* =========================
    🔘 Buttons (utilities)
    ========================= */
-.btn{ height:40px; padding:0 14px; border-radius:10px; border:1px solid transparent;
-  display:inline-flex; align-items:center; gap:8px; cursor:pointer; transition:.18s ease;
-  font-weight:600; letter-spacing:.2px; user-select:none;
+.btn {
+  height: 60px;           
+  padding: 0 28px;         
+  font-size: 1.1rem;       
+  border-radius: 14px;
 }
-.btn--primary{ background:var(--brand); color:#fff; }
-.btn--primary:hover{ background:var(--brand-600); box-shadow:0 8px 18px rgba(91,140,255,.35); }
-.btn--ghost{ background:transparent; color:#dee6ff; border-color:rgba(255,255,255,.12); }
-.btn--ghost:hover{ background:rgba(255,255,255,.07); }
+
+.btn--primary {
+  background: var(--brand);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--brand-600);
+  box-shadow: 0 8px 22px rgba(91, 140, 255, 0.45);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: #dee6ff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.03);
+  transition: all 0.2s ease-in-out;
+}
+
 
 /* =========================
    📋 Tables (para tus CRUD)

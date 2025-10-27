@@ -17,6 +17,9 @@ export default function App() {
         <div className="card card--hero">
           <h1> CONEXA - Proyecto NEO4J</h1>
           <p className="small">Sistema de Gestión de Usuarios, Publicaciones y Comentarios basado en Neo4j</p>
+          
+          <h3>Bienvenido/a. Aquí iniciaremos el CRUD para Usuarios, Posts y Comentarios.</h3>
+          
           <div style={{height:20}} />
           <Home />
           <div style={{height:16}} />

@@ -1,50 +1,25 @@
-import { useState } from 'react';
-import Home from './pages/Home.jsx';
-import Users from './pages/Users.jsx';
-import Posts from './pages/Posts.jsx';
-import Comments from './pages/Comments.jsx';
-import NotFound from './pages/NotFound.jsx';
+import { useContext, useState } from "react";
+import { AuthContext } from "./context/AuthContext.jsx";
 
-const PAGES = { home:'home', users:'users', posts:'posts', comments:'comments' };
+// Vistas
+import Comments from "./pages/Comments.jsx";            // Vista usuario final (feed)
+import Users from "./pages/Users.jsx";                  // CRUD USUARIO (admin)
+import Posts from "./pages/Posts.jsx";                  // CRUD POST (admin)
+import CommentsAdmin from "./pages/CommentsAdmin.jsx";  // CRUD COMENTARIO (admin)
+import Queries from "./pages/Queries.jsx";              // Consultas (admin)
+
+// Tabs del modo admin
+const ADMIN_PAGES = {
+  users: "users",
+  posts: "posts",
+  comments: "comments",
+  queries: "queries",
+};
 
 export default function App() {
-  const [page, setPage] = useState(PAGES.home);
-  const is = (p) => page === p;
-
-  const renderPage = () => {
-    switch (page) {
-      case PAGES.home:
-        return (
-          <div className="card card--hero">
-            <h1> CONEXA - Proyecto NEO4J</h1>
-            <p className="small">Sistema de Gestión de Usuarios, Publicaciones y Comentarios basado en Neo4j</p>
-
-            <h3>Bienvenido/a. Aquí iniciaremos el CRUD para Usuarios, Posts y Comentarios.</h3>
-
-            <div style={{height:20}} />
-            <Home />
-            <div style={{height:16}} />
-
-            <div style={{ display:'flex', gap:10}}>
-              <button className="btn btn--primary" onClick={() => setPage(PAGES.users)}>
-                Gestionar Usuarios
-              </button>
-              <button className="btn btn--ghost" onClick={() => setPage(PAGES.posts)}>
-                Gestionar Posts
-              </button>
-              {/* FIX: antes iba a posts, ahora a comments */}
-              <button className="btn btn--ghost" onClick={() => setPage(PAGES.comments)}>
-                Gestionar Comentarios
-              </button>
-            </div>
-          </div>
-        );
-      case PAGES.users: return <div className="card"><Users /></div>;
-      case PAGES.posts: return <div className="card"><Posts /></div>;
-      case PAGES.comments: return <div className="card"><Comments /></div>;
-      default: return <div className="card"><NotFound /></div>;
-    }
-  };
+  const { currentUser, authLoading } = useContext(AuthContext) || {};
+  const [adminMode, setAdminMode] = useState(false);
+  const [adminPage, setAdminPage] = useState(ADMIN_PAGES.users);
 
   return (
     <>
@@ -56,55 +31,92 @@ export default function App() {
             <span>CONEXA NEO4J</span>
           </div>
 
-          {/* NAV visible pero inutilizable */}
           <nav className="nav">
             <button
-              className={`nav__btn ${is(PAGES.home) ? 'nav__btn--active':''}`}
-              onClick={() => setPage(PAGES.home)}
+              className={`nav__btn ${!adminMode ? "nav__btn--active" : ""}`}
+              onClick={() => setAdminMode(false)}
+              type="button"
             >
               Inicio
             </button>
-
-            {/* Deshabilitados: sin foco, sin eventos */}
             <button
-              className="nav__btn"
-              disabled
-              aria-disabled="true"
-              tabIndex={-1}
+              className={`nav__btn ${adminMode ? "nav__btn--active" : ""}`}
+              onClick={() => setAdminMode(true)}
+              type="button"
             >
-              Usuarios
-            </button>
-
-            <button
-              className="nav__btn"
-              disabled
-              aria-disabled="true"
-              tabIndex={-1}
-            >
-              Posts
-            </button>
-
-            <button
-              className="nav__btn"
-              disabled
-              aria-disabled="true"
-              tabIndex={-1}
-            >
-              Comentarios
+              Admin
             </button>
           </nav>
+
+          <div className="header__user small">
+            {authLoading
+              ? "Cargando…"
+              : currentUser
+              ? `Sesión: ${currentUser.nombre}`
+              : "Invitado"}
+          </div>
         </div>
       </header>
 
-      {/* PAGE */}
+      {/* MAIN */}
       <main className="container page">
-        {renderPage()}
+        {!adminMode ? (
+          // Vista de usuario final (tipo Facebook sencillo)
+          <Comments />
+        ) : (
+          // Vista Admin con tabs CRUD + Consultas
+          <div className="card">
+            <div className="crud-tabs" style={{ marginBottom: 12 }}>
+              <button
+                className={`crud-tab ${
+                  adminPage === ADMIN_PAGES.users ? "crud-tab--active" : ""
+                }`}
+                onClick={() => setAdminPage(ADMIN_PAGES.users)}
+                type="button"
+              >
+                Usuarios
+              </button>
+              <button
+                className={`crud-tab ${
+                  adminPage === ADMIN_PAGES.posts ? "crud-tab--active" : ""
+                }`}
+                onClick={() => setAdminPage(ADMIN_PAGES.posts)}
+                type="button"
+              >
+                Posts
+              </button>
+              <button
+                className={`crud-tab ${
+                  adminPage === ADMIN_PAGES.comments ? "crud-tab--active" : ""
+                }`}
+                onClick={() => setAdminPage(ADMIN_PAGES.comments)}
+                type="button"
+              >
+                Comentarios
+              </button>
+              <button
+                className={`crud-tab ${
+                  adminPage === ADMIN_PAGES.queries ? "crud-tab--active" : ""
+                }`}
+                onClick={() => setAdminPage(ADMIN_PAGES.queries)}
+                type="button"
+              >
+                Consultas
+              </button>
+            </div>
+
+            {adminPage === ADMIN_PAGES.users && <Users />}
+            {adminPage === ADMIN_PAGES.posts && <Posts />}
+            {adminPage === ADMIN_PAGES.comments && <CommentsAdmin />}
+            {adminPage === ADMIN_PAGES.queries && <Queries />}
+          </div>
+        )}
       </main>
 
       {/* FOOTER */}
       <footer className="footer">
         <div className="container small">
-          © {new Date().getFullYear()} Neo4j CRUD – Frontend
+          © {new Date().getFullYear()} Neo4j – Frontend
         </div>
       </footer>
     </>

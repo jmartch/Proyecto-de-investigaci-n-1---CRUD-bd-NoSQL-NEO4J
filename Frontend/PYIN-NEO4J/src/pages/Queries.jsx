@@ -1,188 +1,150 @@
-import { useState } from "react";
+// src/pages/Queries.jsx
+import { useState } from 'react';
+import { api } from '../lib/api';
 
 export default function Queries() {
-  const [tab, setTab] = useState("c1"); // c1 | c2
+  const [tab, setTab] = useState('c1');
 
   return (
     <div className="container" style={{ paddingTop: 8 }}>
-      {/* Submenú de consultas */}
-      <div className="crud-tabs" style={{ marginBottom: 12 }}>
-        <button
-          className={`crud-tab ${tab === "c1" ? "crud-tab--active" : ""}`}
-          onClick={() => setTab("c1")}
-        >
-          CONSULTA 1
-        </button>
-        <button
-          className={`crud-tab ${tab === "c2" ? "crud-tab--active" : ""}`}
-          onClick={() => setTab("c2")}
-        >
-          CONSULTA 2
-        </button>
+      <div className="crud-tabs">
+        <button className={`crud-tab ${tab==='c1'?'crud-tab--active':''}`} onClick={()=>setTab('c1')}>Consulta 1</button>
+        <button className={`crud-tab ${tab==='c2'?'crud-tab--active':''}`} onClick={()=>setTab('c2')}>Consulta 2</button>
       </div>
 
-      {/* ================= CONSULTA 1 ================= */}
-      {tab === "c1" && (
-        <>
-          <section className="crud-section">
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <h3 className="crud-title">CONSULTA 1</h3>
-
-              {/* menú de tres puntos opcional (visual) */}
-              <div className="menu-container">
-                <button className="menu-trigger">⋮</button>
-                <div className="menu-dropdown">
-                  <button className="menu-item">Refrescar</button>
-                  <button className="menu-item">Exportar</button>
-                  <button className="menu-item">Cerrar</button>
-                </div>
-              </div>
-            </div>
-
-            <p className="small" style={{ marginBottom: 12 }}>
-              Listar los <b>POST</b> que ha hecho un <b>USUARIO</b> (excluyendo “ANONIMO” y “MANAGER”).
-            </p>
-
-            {/* Filtros (solo UI) */}
-            <form className="form">
-              <div className="field-row">
-                <div className="field">
-                  <label className="label">Nombre de usuario *</label>
-                  <input className="input" placeholder="Ingrese nombre de usuario" />
-                </div>
-                <div className="field">
-                  <label className="label">Exclusiones</label>
-                  <input className="input" value="ANONIMO, MANAGER" disabled />
-                </div>
-              </div>
-
-              <div className="actions">
-                <button className="btn btn--primary btn--disabled" type="button" disabled>
-                  Ejecutar consulta
-                </button>
-                <button className="btn btn--ghost btn--disabled" type="button" disabled>
-                  Limpiar
-                </button>
-              </div>
-            </form>
-          </section>
-
-          {/* Resultados C1 */}
-          <section className="card" style={{ marginTop: 12 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <h3 className="crud-title" style={{ marginBottom: 8 }}>Resultados – CONSULTA 1</h3>
-              <div className="menu-container">
-                <button className="menu-trigger">⋮</button>
-                <div className="menu-dropdown">
-                  <button className="menu-item">Copiar</button>
-                  <button className="menu-item">Exportar CSV</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="table-wrap">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>IDP</th>
-                    <th>Contenido</th>
-                    <th>Autor (USUARIO)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colSpan={3}>
-                      <div className="empty">No hay resultados para mostrar.</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
-      )}
-
-      {/* ================= CONSULTA 2 ================= */}
-      {tab === "c2" && (
-        <>
-          <section className="crud-section">
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <h3 className="crud-title">CONSULTA 2</h3>
-              <div className="menu-container">
-                <button className="menu-trigger">⋮</button>
-                <div className="menu-dropdown">
-                  <button className="menu-item">Refrescar</button>
-                  <button className="menu-item">Exportar</button>
-                  <button className="menu-item">Cerrar</button>
-                </div>
-              </div>
-            </div>
-
-            <p className="small" style={{ marginBottom: 12 }}>
-              Comentarios de un <b>POST</b> de un usuario, mostrando:
-              <i> fecha-hora de creación, el comentario, fecha-hora de autorización, quién autorizó y si fue “megusta” o “nomegusta”.</i>
-            </p>
-
-            {/* Filtros (solo UI) */}
-            <form className="form">
-              <div className="field-row">
-                <div className="field">
-                  <label className="label">Nombre de usuario *</label>
-                  <input className="input" placeholder="Ingrese nombre de usuario" />
-                </div>
-                <div className="field">
-                  <label className="label">ID del POST (IDP) *</label>
-                  <input className="input" placeholder="Ingrese IDP del post" />
-                </div>
-              </div>
-
-              <div className="actions">
-                <button className="btn btn--primary btn--disabled" type="button" disabled>
-                  Ejecutar consulta
-                </button>
-                <button className="btn btn--ghost btn--disabled" type="button" disabled>
-                  Limpiar
-                </button>
-              </div>
-            </form>
-          </section>
-
-          {/* Resultados C2 */}
-          <section className="card" style={{ marginTop: 12 }}>
-            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-              <h3 className="crud-title" style={{ marginBottom: 8 }}>Resultados – CONSULTA 2</h3>
-              <div className="menu-container">
-                <button className="menu-trigger">⋮</button>
-                <div className="menu-dropdown">
-                  <button className="menu-item">Copiar</button>
-                  <button className="menu-item">Exportar CSV</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="table-wrap">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Fecha creación</th>
-                    <th>Comentario</th>
-                    <th>Fecha autorización</th>
-                    <th>Autorizado por</th>
-                    <th>Like/NoLike</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colSpan={5}>
-                      <div className="empty">No hay resultados para mostrar.</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </>
-      )}
+      {tab==='c1' ? <Consulta1/> : <Consulta2/>}
     </div>
+  );
+}
+
+// [0.5] CONSULTA 1: Posts de un usuario (excluye ANONIMO/MANAGER)
+function Consulta1(){
+  const [nombre, setNombre] = useState('');
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+
+  async function buscar(e){
+    e.preventDefault();
+    try {
+      setLoading(true); setErr(null); setRows([]);
+      const q = nombre.trim() ? `/consultas/posts-por-usuario?nombre=${encodeURIComponent(nombre.trim())}` : '/consultas/posts-por-usuario';
+      const data = await api(q);
+      setRows(Array.isArray(data) ? data : []);
+    } catch (e){ setErr(e.message); } finally { setLoading(false); }
+  }
+
+  return (
+    <section className="card">
+      <h3 className="crud-title">Consulta 1: Posts por usuario (≠ ANONIMO / MANAGER)</h3>
+      <form className="form" onSubmit={buscar} style={{ marginBottom:12 }}>
+        <div className="field-row">
+          <div className="field">
+            <label className="label">Nombre de usuario (opcional)</label>
+            <input className="input" value={nombre} onChange={e=>setNombre(e.target.value)} placeholder="Ej: Camila"/>
+          </div>
+        </div>
+        <div className="actions">
+          <button className="btn btn--primary">Buscar</button>
+        </div>
+      </form>
+
+      {err && <div style={{color:'red', padding:8, marginBottom:8}}>⚠️ {err}</div>}
+      {loading && <div className="empty">Buscando…</div>}
+      {!loading && rows.length===0 && <div className="empty">Sin resultados.</div>}
+      {!loading && rows.length>0 && (
+        <table style={{ width:'100%', borderCollapse:'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom:'2px solid #ddd', textAlign:'left' }}>
+              <th style={{ padding:'12px 8px' }}>Usuario</th>
+              <th style={{ padding:'12px 8px' }}>IDP</th>
+              <th style={{ padding:'12px 8px' }}>Título</th>
+              <th style={{ padding:'12px 8px' }}>Contenido</th>
+              <th style={{ padding:'12px 8px' }}>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r,i)=>(
+              <tr key={i} style={{ borderBottom:'1px solid #eee' }}>
+                <td style={{ padding:'12px 8px' }}>{r.usuario}</td>
+                <td style={{ padding:'12px 8px' }}>{r.idp}</td>
+                <td style={{ padding:'12px 8px' }}>{r.titulo}</td>
+                <td style={{ padding:'12px 8px' }}>{r.contenido}</td>
+                <td style={{ padding:'12px 8px' }}>{r.fecha ? new Date(r.fecha).toLocaleString() : '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
+  );
+}
+
+// [0.5] CONSULTA 2: Comentarios de un post (con fechas y autorización)
+function Consulta2(){
+  const [idp, setIdp] = useState('');
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+
+  async function buscar(e){
+    e.preventDefault();
+    if (!idp.trim()) return;
+    try {
+      setLoading(true); setErr(null); setRows([]);
+      const data = await api(`/consultas/comentarios-post?idp=${encodeURIComponent(idp.trim())}`);
+      setRows(Array.isArray(data) ? data : []);
+    } catch (e){ setErr(e.message); } finally { setLoading(false); }
+  }
+
+  return (
+    <section className="card">
+      <h3 className="crud-title">Consulta 2: Comentarios de un POST</h3>
+      <form className="form" onSubmit={buscar} style={{ marginBottom:12 }}>
+        <div className="field-row">
+          <div className="field">
+            <label className="label">IDP del post *</label>
+            <input className="input" value={idp} onChange={e=>setIdp(e.target.value)} placeholder="ID del post"/>
+          </div>
+        </div>
+        <div className="actions">
+          <button className={`btn btn--primary ${!idp.trim()?'btn--disabled':''}`} disabled={!idp.trim()}>Buscar</button>
+        </div>
+      </form>
+
+      {err && <div style={{color:'red', padding:8, marginBottom:8}}>⚠️ {err}</div>}
+      {loading && <div className="empty">Buscando…</div>}
+      {!loading && rows.length===0 && <div className="empty">Sin resultados.</div>}
+      {!loading && rows.length>0 && (
+        <table style={{ width:'100%', borderCollapse:'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom:'2px solid #ddd', textAlign:'left' }}>
+              <th style={{ padding:'12px 8px' }}>Autor del post</th>
+              <th style={{ padding:'12px 8px' }}>Título</th>
+              <th style={{ padding:'12px 8px' }}>Consec</th>
+              <th style={{ padding:'12px 8px' }}>F. creación</th>
+              <th style={{ padding:'12px 8px' }}>Comentario</th>
+              <th style={{ padding:'12px 8px' }}>F. autorización</th>
+              <th style={{ padding:'12px 8px' }}>Quién autorizó</th>
+              <th style={{ padding:'12px 8px' }}>Like/NoLike</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r,i)=>(
+              <tr key={i} style={{ borderBottom:'1px solid #eee' }}>
+                <td style={{ padding:'12px 8px' }}>{r.autorPost || '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.tituloPost || '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.consec || '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.fechorCom ? new Date(r.fechorCom).toLocaleString() : '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.contenido || '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.fechorAut ? new Date(r.fechorAut).toLocaleString() : '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.quienAutorizo || '-'}</td>
+                <td style={{ padding:'12px 8px' }}>{r.likeNotLike ?? '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </section>
   );
 }

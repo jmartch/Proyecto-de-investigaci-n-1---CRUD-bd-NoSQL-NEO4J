@@ -5,6 +5,9 @@ const driver = neo4j.driver(
   neo4j.auth.basic('neo4j', 'admin2025')
 );
 
+let databaseName = 'neo4j';
+let isInitialized = false;
+
 async function getAvailableDatabase() {
   const systemSession = driver.session({ database: 'system' });
   
@@ -18,21 +21,21 @@ async function getAvailableDatabase() {
     
     if (result.records.length > 0) {
       const dbName = result.records[0].get('name');
-      console.log(`Usando base de datos: ${dbName}`);
+      console.log(`📊 Usando base de datos: ${dbName}`);
       return dbName;
     }
     
     throw new Error('No hay bases de datos activas');
   } catch (err) {
-    console.error('Error obteniendo base de datos:', err.message);
-    return 'neo4j'; // fallback
+    console.error('⚠️ Error obteniendo base de datos:', err.message);
+    return 'neo4j';
   } finally {
     await systemSession.close();
   }
 }
 
-async function createSchema(databaseName) {
-  const session = driver.session({ database: databaseName });
+async function createSchema(dbName) {
+  const session = driver.session({ database: dbName });
   
   try {
     await session.run(`
@@ -50,23 +53,62 @@ async function createSchema(databaseName) {
       FOR (c:COMENTARIO) REQUIRE c.consec IS UNIQUE
     `);
     
-    console.log("Esquema creado correctamente");
+    console.log("✅ Constraints creadas correctamente");
   } catch (err) {
-    console.error("Error creando esquema:", err.message);
+    if (!err.message.includes('equivalent constraint already exists')) {
+      console.error("❌ Error creando constraints:", err.message);
+      throw err;
+    }
   } finally {
     await session.close();
   }
 }
 
 async function initialize() {
+  if (isInitialized) {
+    console.log('ℹ️ Base de datos ya inicializada');
+    return;
+  }
+  
   try {
-    const dbName = await getAvailableDatabase();
-    await createSchema(dbName);
+    console.log('🔌 Conectando a Neo4j...');
+    
+    // Verificar conexión
+    const session = driver.session();
+    await session.run('RETURN 1');
+    await session.close();
+    
+    databaseName = await getAvailableDatabase();
+    await createSchema(databaseName);
+    
+    isInitialized = true;
+    console.log("✅ Base de datos inicializada correctamente");
   } catch (error) {
-    console.error('Error en inicialización:', error.message);
+    console.error('❌ Error en inicialización:', error.message);
+    throw new Error(`No se pudo conectar a Neo4j: ${error.message}`);
   }
 }
 
-initialize().catch(console.error);
+function getSession() {
+  if (!isInitialized) {
+    console.warn('⚠️ Intentando obtener sesión antes de inicializar');
+  }
+  return driver.session({ database: databaseName });
+}
 
-module.exports = { driver };
+async function close() {
+  try {
+    await driver.close();
+    console.log('📪 Conexión a Neo4j cerrada');
+  } catch (error) {
+    console.error('❌ Error cerrando conexión:', error.message);
+  }
+}
+
+module.exports = { 
+  driver, 
+  getSession,
+  initialize,
+  close,
+  databaseName 
+};

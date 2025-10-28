@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 const usuarioCtrl = require('../controllers/usuario.controller');
 
-//Crear un usuario
+// LISTAR todos los usuarios 
+router.get('/', usuarioCtrl.getAllUsuarios);
+
+// Crear un usuario
 router.post('/', usuarioCtrl.create);
 
-//Actualizar usuario 
+// Actualizar usuario 
 router.put('/:idu', usuarioCtrl.update);
 
-//eliminar usuario 
+// Eliminar usuario 
 router.delete('/:idu', usuarioCtrl.delete);
 
 module.exports = router;

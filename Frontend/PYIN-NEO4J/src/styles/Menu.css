@@ -1,0 +1,40 @@
+.menu-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background-color: #111;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 280px;
+  margin: 20px auto;
+  box-shadow: 0 0 10px #00bcd4;
+}
+
+.menu-container h2 {
+  margin-bottom: 10px;
+  color: #00bcd4;
+}
+
+.menu-container button {
+  background: #00bcd4;
+  color: #111;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.menu-container button:hover {
+  background: #008c9e;
+  color: white;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}

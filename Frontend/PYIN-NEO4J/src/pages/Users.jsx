@@ -30,7 +30,7 @@ export default function Users() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`${API_URL}/usuarios`);
+      const response = await fetch(`${API_URL}/usuarios/`);
       
       if (!response.ok) {
         throw new Error('Error al cargar usuarios');

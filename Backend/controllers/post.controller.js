@@ -5,11 +5,10 @@ exports.getAllPosts = async (req, res) => {
   try {
     const result = await Post.getAllPosts();
     const posts = result.records.map(record => ({
-      ...record.get('p').properties,
-      usuario: {
-        idu: record.get('idu'),
-        nombre: record.get('nombreUsuario')
-      }
+      idp: record.get('idp'),
+      contenido: record.get('contenido'),
+      idu: record.get('idu'),
+      nombreUsuario: record.get('nombreUsuario')
     }));
     res.json(posts);
   } catch (error) {
@@ -17,7 +16,6 @@ exports.getAllPosts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 // ✅ Crear post
 exports.create = async (req, res) => {
   try {

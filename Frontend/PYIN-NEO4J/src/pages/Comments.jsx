@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import './Comments.css';
 
 export default function Comments() {
   const [tab, setTab] = useState("insertar");
@@ -517,9 +518,12 @@ export default function Comments() {
                 </tbody>
               </table>
             </div>
+            
           )}
+          
         </div>
       </div>
     </div>
   );
+  
 }
